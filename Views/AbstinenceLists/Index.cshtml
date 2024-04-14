@@ -1,0 +1,95 @@
+﻿@model IEnumerable<Labb1Theres.Models.AbstinenceList>
+
+@{
+    ViewData["Title"] = "Index";
+    var allEmployees = ViewBag.AllEmployees as List<Employee>;
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+
+<div class="form-group">
+    <label for="employeeFilter" class="control-label">Filter by Employee:</label>
+    <select id="employeeFilter" class="form-control">
+        <option value="">All Employees</option>
+        @foreach (var employee in allEmployees)
+        {
+            <option value="@employee.EmployeeId">@employee.EmployeeName</option>
+        }
+    </select>
+</div>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Employee.EmployeeName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AbstinenceType)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AbstinenceStart)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AbstinenceEnd)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Employee.EmployeeName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.AbstinenceType.AbstinenceName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.AbstinenceStart)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.AbstinenceEnd)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+@{
+    var allEmployeesJson = Newtonsoft.Json.JsonConvert.SerializeObject(allEmployees.Select(e => new { e.EmployeeId, e.EmployeeName }));
+}
+
+@section scripts {
+    <script>
+        var allEmployees = @Html.Raw(allEmployeesJson);
+
+        $(document).ready(function () {
+            $('#employeeFilter').change(function () {
+                var selectedEmployeeId = $(this).val();
+                $('tbody tr').hide();
+                if (selectedEmployeeId === '') {
+                    $('tbody tr').show();
+                } else {
+                    $('tbody tr').each(function () {
+                        var employeeName = $(this).find('td:first-child').text().trim();
+                        var employee = allEmployees.find(x => x.EmployeeId == selectedEmployeeId);
+                        if (employeeName === employee.EmployeeName) {
+                            $(this).show();
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+}
